@@ -28,6 +28,7 @@ import UIKit
 
 class MapViewController: UIViewController, TypesTableViewControllerDelegate {
   
+  @IBOutlet weak var mapView: GMSMapView!
   @IBOutlet weak var mapCenterPinImage: UIImageView!
   @IBOutlet weak var pinImageVerticalConstraint: NSLayoutConstraint!
   var searchedTypes = ["bakery", "bar", "cafe", "grocery_or_supermarket", "restaurant"]
