@@ -28,6 +28,7 @@ import UIKit
 
 class MapViewController: UIViewController, TypesTableViewControllerDelegate {
   
+  @IBOutlet weak var mapView: GMSMapView!
   @IBOutlet weak var mapCenterPinImage: UIImageView!
   @IBOutlet weak var pinImageVerticalConstraint: NSLayoutConstraint!
   var searchedTypes = ["bakery", "bar", "cafe", "grocery_or_supermarket", "restaurant"]
@@ -40,7 +41,7 @@ class MapViewController: UIViewController, TypesTableViewControllerDelegate {
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     if segue.identifier == "Types Segue" {
       let navigationController = segue.destinationViewController as! UINavigationController
-      let controller = segue.destinationViewController.topViewController as! TypesTableViewController
+      let controller = navigationController.topViewController as! TypesTableViewController
       controller.selectedTypes = searchedTypes
       controller.delegate = self
     }
@@ -48,9 +49,9 @@ class MapViewController: UIViewController, TypesTableViewControllerDelegate {
 }
 
 // MARK: - TypesTableViewControllerDelegate
-extension MapViewController: TypesTableViewControllerDelegate {
+extension MapViewController{//: TypesTableViewControllerDelegate {
   func typesController(controller: TypesTableViewController, didSelectTypes types: [String]) {
-    searchedTypes = sorted(controller.selectedTypes)
+    searchedTypes = controller.selectedTypes.sort()
     dismissViewControllerAnimated(true, completion: nil)
   }
 }
