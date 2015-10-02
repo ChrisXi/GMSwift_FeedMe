@@ -33,9 +33,14 @@ class MapViewController: UIViewController, TypesTableViewControllerDelegate {
   @IBOutlet weak var pinImageVerticalConstraint: NSLayoutConstraint!
   var searchedTypes = ["bakery", "bar", "cafe", "grocery_or_supermarket", "restaurant"]
   
+  let locationManager = CLLocationManager()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view, typically from a nib.
+    self.locationManager.delegate = self
+    self.locationManager.requestWhenInUseAuthorization()
+
   }
   
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -54,4 +59,28 @@ extension MapViewController{//: TypesTableViewControllerDelegate {
     searchedTypes = controller.selectedTypes.sort()
     dismissViewControllerAnimated(true, completion: nil)
   }
+}
+
+extension MapViewController: CLLocationManagerDelegate {
+
+  func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+    if status == .AuthorizedWhenInUse {
+      
+      locationManager.startUpdatingLocation()
+      
+      mapView.myLocationEnabled = true
+      mapView.settings.myLocationButton = true
+
+    }
+  }
+  
+  func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    let location = locations.last;
+      
+    mapView.camera = GMSCameraPosition(target: location!.coordinate, zoom: 15, bearing: 0, viewingAngle: 0)
+    
+    locationManager.stopUpdatingLocation()
+    
+  }
+
 }
