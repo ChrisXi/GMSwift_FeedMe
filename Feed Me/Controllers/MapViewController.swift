@@ -28,6 +28,7 @@ import UIKit
 
 class MapViewController: UIViewController, TypesTableViewControllerDelegate {
   
+  @IBOutlet weak var addressLabel: UILabel!
   @IBOutlet weak var mapView: GMSMapView!
   @IBOutlet weak var mapCenterPinImage: UIImageView!
   @IBOutlet weak var pinImageVerticalConstraint: NSLayoutConstraint!
@@ -40,6 +41,7 @@ class MapViewController: UIViewController, TypesTableViewControllerDelegate {
     // Do any additional setup after loading the view, typically from a nib.
     self.locationManager.delegate = self
     self.locationManager.requestWhenInUseAuthorization()
+    self.mapView.delegate = self
 
   }
   
@@ -51,6 +53,34 @@ class MapViewController: UIViewController, TypesTableViewControllerDelegate {
       controller.delegate = self
     }
   }
+  
+  func reverseGeocodeCoordinate(coordinate: CLLocationCoordinate2D) {
+    
+    let geocoder = GMSGeocoder()
+    
+    geocoder.reverseGeocodeCoordinate(coordinate) { response, error in
+      if let address = response?.firstResult() {
+        self.addressLabel.unlock()
+        
+        let lines = address.lines as! [String]
+        self.addressLabel.text = lines.joinWithSeparator("\n");  // = join("\n", lines)
+        
+        UIView.animateWithDuration(0.25) {
+          self.view.layoutIfNeeded()
+        }
+      }
+    }
+    
+    let labelHeight = self.addressLabel.intrinsicContentSize().height
+    self.mapView.padding = UIEdgeInsets(top: self.topLayoutGuide.length, left: 0,
+      bottom: labelHeight, right: 0)
+    
+    UIView.animateWithDuration(0.25) {
+      self.pinImageVerticalConstraint.constant = ((labelHeight - self.topLayoutGuide.length) * 0.5)
+      self.view.layoutIfNeeded()
+    }
+  }
+
 }
 
 // MARK: - TypesTableViewControllerDelegate
@@ -82,5 +112,14 @@ extension MapViewController: CLLocationManagerDelegate {
     locationManager.stopUpdatingLocation()
     
   }
-
 }
+
+extension MapViewController: GMSMapViewDelegate {
+  func mapView(mapView: GMSMapView!, idleAtCameraPosition position: GMSCameraPosition!) {
+    reverseGeocodeCoordinate(position.target)
+  }
+  func mapView(mapView: GMSMapView!, willMove gesture: Bool) {
+    addressLabel.lock()
+  }
+}
+
