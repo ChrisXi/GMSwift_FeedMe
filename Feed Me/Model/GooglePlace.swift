@@ -52,7 +52,7 @@ class GooglePlace {
     var foundType = "restaurant"
     let possibleTypes = acceptedTypes.count > 0 ? acceptedTypes : ["bakery", "bar", "cafe", "grocery_or_supermarket", "restaurant"]
     for type in json["types"].arrayObject as! [String] {
-      if possibleTypes.contains(type) {
+      if contains(possibleTypes, type) {
         foundType = type
         break
       }

@@ -39,7 +39,7 @@ class GoogleDataProvider {
   func fetchPlacesNearCoordinate(coordinate: CLLocationCoordinate2D, radius: Double, types:[String], completion: (([GooglePlace]) -> Void)) -> ()
   {
     var urlString = "http://localhost:10000/maps/api/place/nearbysearch/json?location=\(coordinate.latitude),\(coordinate.longitude)&radius=\(radius)&rankby=prominence&sensor=true"
-    let typesString = types.count > 0 ? types.joinWithSeparator("|") : "food"
+    let typesString = types.count > 0 ? join("|", types) : "food"
     urlString += "&types=\(typesString)"
     urlString = urlString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
     
@@ -50,7 +50,7 @@ class GoogleDataProvider {
     placesTask = session.dataTaskWithURL(NSURL(string: urlString)!) {data, response, error in
       UIApplication.sharedApplication().networkActivityIndicatorVisible = false
       var placesArray = [GooglePlace]()
-      let json = JSON(data:data!, options:NSJSONReadingOptions.MutableContainers, error:nil)
+      let json = JSON(data:data, options:NSJSONReadingOptions.MutableContainers, error:nil)
       if let results = json["results"].arrayObject as? [[String : AnyObject]] {
         for rawPlace in results {
           let place = GooglePlace(dictionary: rawPlace, acceptedTypes: types)
